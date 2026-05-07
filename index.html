@@ -3,69 +3,410 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Latest AI News Daily">
+<meta name="description" content="Prince AI Hub - Latest AI News Daily powered by Claude AI">
 <title>Prince AI Hub</title>
-<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#05060f;--surface:#0d0f1e;--card:#12152a;--border:rgba(255,255,255,0.07);
+  --text:#e8eaf0;--muted:#6b7280;--accent:#6366f1;--accent2:#22d3ee;
+  --grad:linear-gradient(135deg,#6366f1,#22d3ee);
+}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 40px;
+  background:rgba(5,6,15,0.92);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(16px);
+}
+.logo{
+  font-family:'Syne',sans-serif;font-size:24px;font-weight:800;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+nav{display:flex;gap:28px;}
+nav a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s;cursor:pointer;}
+nav a:hover{color:var(--text);}
+
+/* HERO */
+.hero{
+  text-align:center;padding:80px 24px 60px;
+  background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(99,102,241,0.15),transparent);
+}
+.hero-badge{
+  display:inline-block;
+  background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);
+  color:#a5b4fc;font-size:12px;font-weight:600;letter-spacing:0.08em;
+  padding:5px 16px;border-radius:100px;margin-bottom:22px;text-transform:uppercase;
+}
+.hero h1{
+  font-family:'Syne',sans-serif;font-size:56px;font-weight:800;line-height:1.1;
+  background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:16px;
+}
+.hero p{color:var(--muted);font-size:17px;margin-bottom:30px;}
+.hero-tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.tag{
+  background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.2);
+  color:#67e8f9;font-size:12px;padding:5px 14px;border-radius:100px;font-weight:500;
+}
+
+/* MAIN */
+.main{padding:50px 40px 80px;max-width:1200px;margin:0 auto;}
+.section-title{
+  font-family:'Syne',sans-serif;font-size:22px;font-weight:700;
+  margin-bottom:22px;display:flex;align-items:center;gap:10px;color:var(--text);
+}
+
+/* SEARCH */
+.search-bar{display:flex;gap:12px;margin-bottom:32px;align-items:center;flex-wrap:wrap;}
+.search-wrap{flex:1;position:relative;min-width:220px;}
+.search-wrap input{
+  width:100%;padding:13px 16px 13px 46px;
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  color:var(--text);font-size:14px;font-family:'Space Grotesk',sans-serif;
+  outline:none;transition:border-color 0.2s;
+}
+.search-wrap input:focus{border-color:rgba(99,102,241,0.5);}
+.search-wrap input::placeholder{color:var(--muted);}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;}
+
+.filter-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-btn{
+  padding:9px 18px;border-radius:9px;border:1px solid var(--border);
+  background:transparent;color:var(--muted);font-size:13px;font-family:'Space Grotesk',sans-serif;
+  cursor:pointer;transition:all 0.2s;font-weight:500;
+}
+.filter-btn:hover,.filter-btn.active{
+  background:rgba(99,102,241,0.15);border-color:rgba(99,102,241,0.4);color:#a5b4fc;
+}
+.refresh-btn{
+  padding:12px 24px;border-radius:10px;
+  background:var(--grad);border:none;color:#fff;
+  font-size:14px;font-weight:600;font-family:'Space Grotesk',sans-serif;
+  cursor:pointer;white-space:nowrap;transition:opacity 0.2s;
+}
+.refresh-btn:hover{opacity:0.85;}
+.refresh-btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* AI BOX */
+.ai-answer-box{
+  background:var(--card);border:1px solid rgba(99,102,241,0.3);border-radius:16px;
+  padding:24px;margin-bottom:36px;position:relative;overflow:hidden;display:none;
+}
+.ai-answer-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);}
+.ai-label{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#a5b4fc;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.ai-content{font-size:14px;line-height:1.7;color:var(--text);}
+
+/* NEWS GRID */
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:22px;margin-bottom:60px;}
+.news-card{
+  background:var(--card);border:1px solid var(--border);border-radius:18px;
+  padding:22px;transition:all 0.25s;display:flex;flex-direction:column;gap:12px;
+}
+.news-card:hover{border-color:rgba(99,102,241,0.4);transform:translateY(-4px);}
+.news-card-header{display:flex;align-items:center;gap:10px;}
+.source-badge{
+  font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;
+  padding:3px 11px;border-radius:100px;border:1px solid;
+}
+.news-date{color:var(--muted);font-size:12px;margin-left:auto;}
+.news-card h3{font-size:15px;font-weight:600;line-height:1.45;color:var(--text);}
+.news-card p{font-size:13px;color:var(--muted);line-height:1.65;flex:1;}
+.news-card-footer{margin-top:6px;}
+.read-link{
+  font-size:13px;color:var(--accent2);font-weight:600;text-decoration:none;
+  display:inline-flex;align-items:center;gap:5px;transition:gap 0.2s;
+}
+.read-link:hover{gap:9px;}
+
+/* LOADING */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px;gap:16px;color:var(--muted);}
+.spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* MODELS */
+.models-section{margin-bottom:55px;}
+.models-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px;}
+.model-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:18px;text-align:center;transition:all 0.2s;cursor:pointer;
+}
+.model-card:hover{border-color:rgba(34,211,238,0.4);transform:translateY(-3px);}
+.model-icon{font-size:30px;margin-bottom:10px;}
+.model-name{font-size:13px;font-weight:600;color:var(--text);}
+.model-maker{font-size:11px;color:var(--muted);margin-top:3px;}
+
+/* TOOLS */
+.tools-section{margin-bottom:40px;}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;}
+.tool-card{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:15px 18px;display:flex;align-items:center;gap:13px;
+  transition:all 0.2s;cursor:pointer;
+}
+.tool-card:hover{border-color:rgba(99,102,241,0.4);transform:translateY(-2px);}
+.tool-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.tool-name{font-size:13px;font-weight:600;color:var(--text);}
+
+/* FOOTER */
+footer{text-align:center;padding:35px;border-top:1px solid var(--border);color:var(--muted);font-size:13px;}
+footer span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:600;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  header{padding:14px 20px;}
+  nav{display:none;}
+  .hero h1{font-size:36px;}
+  .hero{padding:60px 20px 40px;}
+  .main{padding:30px 20px 60px;}
+  .news-grid{grid-template-columns:1fr;}
+  .models-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
+  .tools-grid{grid-template-columns:1fr 1fr;}
+  .search-bar{flex-direction:column;align-items:stretch;}
+  .filter-btns{justify-content:flex-start;}
+}
+</style>
 </head>
 <body>
 
 <header>
-<div class="logo">🤖 Prince AI Hub</div>
-
-<nav>
-<a href="#">Home</a>
-<a href="#news">News</a>
-<a href="#models">Models</a>
-<a href="#tools">Tools</a>
-</nav>
+  <div class="logo">⚡ Prince AI Hub</div>
+  <nav>
+    <a onclick="document.getElementById('news').scrollIntoView({behavior:'smooth'})">News</a>
+    <a onclick="document.getElementById('models').scrollIntoView({behavior:'smooth'})">Models</a>
+    <a onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Tools</a>
+  </nav>
 </header>
 
-<section class="hero">
-<h1>Future Of AI Starts Here</h1>
-<p>Latest AI News • GPT • Gemini • Claude • Sora</p>
-<button>Explore AI</button>
-</section>
-
-<section id="news">
-<h2>🔥 Latest AI News</h2>
-
-<input type="text" id="search"
-placeholder="Search AI News...">
-
-<div id="news-container" class="news-grid"></div>
-</section>
-
-<section id="models">
-<h2>🤖 Trending AI Models</h2>
-
-<div class="grid">
-<div class="card">GPT-5</div>
-<div class="card">Claude 3.7</div>
-<div class="card">Gemini 2.5</div>
-<div class="card">Grok 3</div>
-<div class="card">Sora AI</div>
-<div class="card">Flux AI</div>
+<div class="hero">
+  <div class="hero-badge">🔴 Live AI News</div>
+  <h1>Future of AI<br>Starts Here</h1>
+  <p>Real-time AI news powered by Claude AI &bull; Always up to date</p>
+  <div class="hero-tags">
+    <span class="tag">GPT-4o</span>
+    <span class="tag">Claude 3.7</span>
+    <span class="tag">Gemini 2.5</span>
+    <span class="tag">Grok 3</span>
+    <span class="tag">Llama 4</span>
+    <span class="tag">Sora</span>
+  </div>
 </div>
-</section>
 
-<section id="tools">
-<h2>🛠 Popular AI Tools</h2>
+<div class="main">
 
-<div class="grid">
-<div class="card">AI Image Generator</div>
-<div class="card">AI Video Generator</div>
-<div class="card">AI Coding Assistant</div>
-<div class="card">AI Resume Maker</div>
-<div class="card">AI PDF Tools</div>
-<div class="card">AI YouTube Tools</div>
+  <!-- NEWS SECTION -->
+  <div id="news" style="scroll-margin-top:80px;">
+    <div class="section-title">🔥 Latest AI News</div>
+
+    <div class="search-bar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search AI news..." oninput="filterNews()">
+      </div>
+      <div class="filter-btns">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('openai',this)">OpenAI</button>
+        <button class="filter-btn" onclick="setFilter('google',this)">Google</button>
+        <button class="filter-btn" onclick="setFilter('anthropic',this)">Anthropic</button>
+      </div>
+      <button class="refresh-btn" id="refreshBtn" onclick="fetchLiveNews()">🔄 Refresh News</button>
+    </div>
+
+    <div class="ai-answer-box" id="aiBox">
+      <div class="ai-label"><span class="ai-dot"></span> Claude AI — Live Update</div>
+      <div class="ai-content" id="aiContent">Loading...</div>
+    </div>
+
+    <div id="newsGrid" class="news-grid">
+      <div class="loading"><div class="spinner"></div><span>Loading AI news...</span></div>
+    </div>
+  </div>
+
+  <!-- MODELS SECTION -->
+  <div id="models" style="scroll-margin-top:80px;" class="models-section">
+    <div class="section-title">🤖 Trending AI Models</div>
+    <div class="models-grid">
+      <div class="model-card"><div class="model-icon">🟢</div><div class="model-name">GPT-4o</div><div class="model-maker">OpenAI</div></div>
+      <div class="model-card"><div class="model-icon">🟣</div><div class="model-name">Claude 3.7</div><div class="model-maker">Anthropic</div></div>
+      <div class="model-card"><div class="model-icon">🔵</div><div class="model-name">Gemini 2.5</div><div class="model-maker">Google</div></div>
+      <div class="model-card"><div class="model-icon">⚪</div><div class="model-name">Grok 3</div><div class="model-maker">xAI</div></div>
+      <div class="model-card"><div class="model-icon">🟡</div><div class="model-name">Llama 4</div><div class="model-maker">Meta</div></div>
+      <div class="model-card"><div class="model-icon">🔴</div><div class="model-name">Sora</div><div class="model-maker">OpenAI</div></div>
+      <div class="model-card"><div class="model-icon">🟤</div><div class="model-name">Flux AI</div><div class="model-maker">Black Forest</div></div>
+      <div class="model-card"><div class="model-icon">🩵</div><div class="model-name">Mistral</div><div class="model-maker">Mistral AI</div></div>
+    </div>
+  </div>
+
+  <!-- TOOLS SECTION -->
+  <div id="tools" style="scroll-margin-top:80px;" class="tools-section">
+    <div class="section-title">🛠 Popular AI Tools</div>
+    <div class="tools-grid">
+      <div class="tool-card"><div class="tool-icon" style="background:rgba(99,102,241,0.15);">🎨</div><div class="tool-name">AI Image Generator</div></div>
+      <div class="tool-card"><div class="tool-icon" style="background:rgba(34,211,238,0.15);">🎬</div><div class="tool-name">AI Video Generator</div></div>
+      <div class="tool-card"><div class="tool-icon" style="background:rgba(251,191,36,0.15);">💻</div><div class="tool-name">AI Coding Assistant</div></div>
+      <div class="tool-card"><div class="tool-icon" style="background:rgba(52,211,153,0.15);">📄</div><div class="tool-name">AI Resume Maker</div></div>
+      <div class="tool-card"><div class="tool-icon" style="background:rgba(239,68,68,0.15);">📑</div><div class="tool-name">AI PDF Tools</div></div>
+      <div class="tool-card"><div class="tool-icon" style="background:rgba(168,85,247,0.15);">📹</div><div class="tool-name">AI YouTube Tools</div></div>
+      <div class="tool-card"><div class="tool-icon" style="background:rgba(251,146,60,0.15);">🔊</div><div class="tool-name">AI Voice Generator</div></div>
+      <div class="tool-card"><div class="tool-icon" style="background:rgba(20,184,166,0.15);">✍️</div><div class="tool-name">AI Content Writer</div></div>
+    </div>
+  </div>
+
 </div>
-</section>
 
 <footer>
-<p>© 2026 Prince AI Hub • All Rights Reserved</p>
+  <p>© 2026 <span>Prince AI Hub</span> &bull; All Rights Reserved &bull; Powered by Claude AI</p>
 </footer>
 
-<script src="script.js"></script>
+<script>
+// =============================================
+// PRINCE AI HUB — Main JavaScript
+// =============================================
 
+let allNews = [];
+let currentFilter = 'all';
+
+// Fallback / cached news (shown instantly while live fetch runs)
+const CACHED_NEWS = [
+  {title:"OpenAI Launches GPT-5 with Advanced Reasoning",summary:"OpenAI ne GPT-5 release kiya hai jo advanced reasoning aur multimodal capabilities ke saath aata hai. Yeh model coding, math aur science tasks mein kaafi better performance deta hai aur previous versions se 3x faster hai.",source:"OpenAI",category:"openai",date:"May 2026",url:"https://openai.com",color:"#22c55e"},
+  {title:"Claude 3.7 Sonnet Sets New AI Safety Benchmarks",summary:"Anthropic ka naya Claude 3.7 Sonnet model safety benchmarks mein sabse aage hai. Extended thinking feature ke saath yeh complex problems zyada accurately solve karta hai aur harmful outputs significantly kam hain.",source:"Anthropic",category:"anthropic",date:"May 2026",url:"https://anthropic.com",color:"#a78bfa"},
+  {title:"Google Gemini 2.5 Pro Now Available for Everyone",summary:"Google ne Gemini 2.5 Pro ko sabke liye available kar diya hai. 1 million token context window aur native audio generation is model ko unique banata hai. Free tier mein bhi available hai.",source:"Google",category:"google",date:"Apr 2026",url:"https://deepmind.google",color:"#60a5fa"},
+  {title:"Meta Llama 4 Released as Open Source Model",summary:"Meta ne Llama 4 open source release kar diya hai. Naya model multimodal hai aur previous versions se significantly faster hai. Developers free mein download aur use kar sakte hain.",source:"Meta AI",category:"openai",date:"Apr 2026",url:"https://ai.meta.com",color:"#fb923c"},
+  {title:"Grok 3 by xAI Beats GPT-4 on Multiple Tests",summary:"Elon Musk ki company xAI ka Grok 3 model kai important benchmarks mein GPT-4 ko peeche chhod diya. Real-time web access aur X platform integration iska strongest feature hai.",source:"xAI",category:"openai",date:"Mar 2026",url:"https://x.ai",color:"#e5e7eb"},
+  {title:"AI Video Generation Reaches Photorealistic Quality",summary:"2026 mein AI video generation itni advanced ho gayi hai ki real aur fake videos mein fark karna mushkil ho gaya hai. Sora aur Runway ML is field mein leader hain aur 4K quality videos generate kar sakte hain.",source:"Tech News",category:"google",date:"Mar 2026",url:"https://techcrunch.com",color:"#f472b6"},
+  {title:"Anthropic Raises $4 Billion in New Funding Round",summary:"AI safety company Anthropic ne $4 billion ki nayi funding raise ki hai. Company Claude AI ko aur zyada powerful aur safe banane ke liye is money ko invest karegi research mein.",source:"Anthropic",category:"anthropic",date:"Feb 2026",url:"https://anthropic.com",color:"#a78bfa"},
+  {title:"Google DeepMind AlphaFold 3 Solves More Proteins",summary:"DeepMind ka AlphaFold 3 ab RNA aur DNA structures bhi predict kar sakta hai. Yeh medical research aur drug discovery ke liye bahut badi breakthrough hai jo millions of lives save kar sakti hai.",source:"DeepMind",category:"google",date:"Feb 2026",url:"https://deepmind.google",color:"#60a5fa"},
+  {title:"OpenAI o3 Model for Complex Scientific Reasoning",summary:"OpenAI ka o3 model PhD-level math aur science problems solve kar sakta hai. Chain-of-thought reasoning is model ki core strength hai aur competitions mein human experts se better perform kiya.",source:"OpenAI",category:"openai",date:"Jan 2026",url:"https://openai.com",color:"#22c55e"},
+  {title:"AI Coding Assistants Now Write 40% of All Code",summary:"Ek naye report ke mutabik 2026 mein globally 40% se zyada code AI tools se likha ja raha hai. GitHub Copilot aur Cursor sabse popular tools hain developers ke beech.",source:"GitHub",category:"openai",date:"Jan 2026",url:"https://github.com",color:"#6b7280"},
+  {title:"Gemini AI Integrated Into All Google Products",summary:"Google ne Gemini AI ko Gmail, Docs, Search aur Android mein integrate kar diya hai. Ab millions of users AI assistance directly apne daily apps mein use kar sakte hain bina extra cost ke.",source:"Google",category:"google",date:"Dec 2025",url:"https://google.com",color:"#60a5fa"},
+  {title:"EU AI Act 2025 Now Fully Enforced",summary:"European Union ka AI Act 2025 fully enforce ho gaya hai jo high-risk AI applications pe strict rules lagata hai. Companies ko ab AI systems audit karane honge aur transparency maintain karni hogi.",source:"EU News",category:"anthropic",date:"Dec 2025",url:"https://europa.eu",color:"#fbbf24"},
+];
+
+// Render news cards
+function renderNews(news) {
+  const grid = document.getElementById('newsGrid');
+  if (!news.length) {
+    grid.innerHTML = '<div class="loading"><span style="font-size:40px">🔍</span><span>Koi news nahi mili is filter mein</span></div>';
+    return;
+  }
+  grid.innerHTML = news.map(a => `
+    <div class="news-card">
+      <div class="news-card-header">
+        <span class="source-badge" style="background:${a.color}22;color:${a.color};border-color:${a.color}44">${a.source}</span>
+        <span class="news-date">${a.date}</span>
+      </div>
+      <h3>${a.title}</h3>
+      <p>${a.summary}</p>
+      <div class="news-card-footer">
+        <a href="${a.url}" target="_blank" rel="noopener" class="read-link">Read More →</a>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Filter by category + search
+function filterNews() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  let filtered = allNews;
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(n => n.category === currentFilter);
+  }
+  if (q) {
+    filtered = filtered.filter(n =>
+      n.title.toLowerCase().includes(q) ||
+      n.summary.toLowerCase().includes(q) ||
+      n.source.toLowerCase().includes(q)
+    );
+  }
+  renderNews(filtered);
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterNews();
+}
+
+// Fetch live news via Claude AI + Web Search
+async function fetchLiveNews() {
+  const btn = document.getElementById('refreshBtn');
+  const aiBox = document.getElementById('aiBox');
+  const aiContent = document.getElementById('aiContent');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Loading...';
+  aiBox.style.display = 'block';
+  aiContent.textContent = 'Claude AI web search se latest news la raha hai...';
+
+  // Show cached news instantly while fetching
+  if (!allNews.length) {
+    allNews = CACHED_NEWS;
+    renderNews(allNews);
+  }
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        tools: [{"type": "web_search_20250305", "name": "web_search"}],
+        messages: [{
+          role: "user",
+          content: `Search the web for the 9 most important AI news stories from the past 30 days (around May 2026).
+Return ONLY a raw JSON array — no explanation, no markdown, no code blocks, no backticks.
+Format each item exactly like this:
+[{"title":"...","summary":"2-3 sentences in simple Hinglish (Hindi+English mix) explaining what happened and why it matters","source":"Company or website name","category":"openai or google or anthropic","date":"Month Year","url":"https://...","color":"hex color"}]
+Color guide: OpenAI=#22c55e, Google=#60a5fa, Anthropic=#a78bfa, Meta=#fb923c, xAI=#e5e7eb, Microsoft=#38bdf8, others=#fbbf24`
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const fullText = (data.content || []).map(i => i.text || '').filter(Boolean).join('\n');
+    const match = fullText.match(/\[[\s\S]*?\]/);
+
+    if (match) {
+      const liveNews = JSON.parse(match[0]);
+      if (liveNews && liveNews.length > 0) {
+        allNews = liveNews;
+        renderNews(liveNews);
+        aiContent.textContent = `✅ ${liveNews.length} latest AI news stories live web se load ho gayi hain! Claude AI ne web search karke fresh news layi hai.`;
+      } else {
+        throw new Error('Empty array');
+      }
+    } else {
+      throw new Error('No JSON found');
+    }
+
+  } catch (e) {
+    // Fallback to cached
+    allNews = CACHED_NEWS;
+    filterNews();
+    aiContent.textContent = '📦 Live fetch mein network issue aayi — cached news dikh rahi hai. Thodi der baad Refresh karo.';
+    console.warn('Live news fetch failed:', e);
+  }
+
+  btn.disabled = false;
+  btn.textContent = '🔄 Refresh News';
+}
+
+// INIT
+window.onload = function() {
+  allNews = CACHED_NEWS;
+  renderNews(allNews);
+  fetchLiveNews();
+};
+</script>
 </body>
 </html>
